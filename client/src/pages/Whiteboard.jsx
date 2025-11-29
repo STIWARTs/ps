@@ -178,7 +178,9 @@ function Whiteboard() {
         await savePage();
         try {
             await boardApi.share(boardId);
-            alert('Board shared with students successfully!');
+            const shareUrl = `${window.location.origin}/view/${boardId}`;
+            await navigator.clipboard.writeText(shareUrl);
+            alert(`Board shared! Link copied to clipboard:\n${shareUrl}`);
         } catch (err) {
             console.error('Failed to share:', err);
             alert('Failed to share board');
