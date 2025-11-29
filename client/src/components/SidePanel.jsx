@@ -65,7 +65,6 @@ function SidePanel({ isOpen, onClose, activeTab, onTabChange, boardId, onRefresh
                 {activeTab === 'attachments' && (
                     <AttachmentsPanel 
                         boardId={boardId} 
-                        currentPage={currentPage}
                         onRefresh={onRefresh}
                     />
                 )}
@@ -176,8 +175,8 @@ function YouTubePanel() {
         try {
             setLoading(true);
             setVideos([]);
-            const response = await youtubeApi.searchEducational(query, 8);
-            setVideos(response.data.videos);
+            const response = await youtubeApi.search(query, 8);
+            setVideos(response.data.videos || []);
         } catch (err) {
             console.error('YouTube search failed:', err);
             alert('Failed to search videos. Please check your API key.');
@@ -263,7 +262,7 @@ function YouTubePanel() {
     );
 }
 
-function AttachmentsPanel({ boardId, currentPage, onRefresh }) {
+function AttachmentsPanel({ boardId, onRefresh }) {
     const [uploading, setUploading] = useState(false);
 
     const handlePdfUpload = async (e) => {
@@ -275,7 +274,7 @@ function AttachmentsPanel({ boardId, currentPage, onRefresh }) {
             const formData = new FormData();
             formData.append('pdf', file);
             formData.append('boardId', boardId);
-            formData.append('pageNumber', currentPage);
+            formData.append('pageNumber', 1);
             
             await uploadApi.uploadPdf(formData);
             alert('PDF uploaded successfully!');
@@ -297,7 +296,7 @@ function AttachmentsPanel({ boardId, currentPage, onRefresh }) {
             const formData = new FormData();
             formData.append('audio', file);
             formData.append('boardId', boardId);
-            formData.append('pageNumber', currentPage);
+            formData.append('pageNumber', 1);
             
             await uploadApi.uploadVoice(formData);
             alert('Audio uploaded successfully!');
@@ -313,7 +312,7 @@ function AttachmentsPanel({ boardId, currentPage, onRefresh }) {
     return (
         <div>
             <h4 style={{ marginBottom: '15px', fontSize: '14px', fontWeight: '600' }}>
-                Upload Attachments for Page {currentPage}
+                Upload Attachments
             </h4>
             
             <div style={{ marginBottom: '20px' }}>
@@ -343,12 +342,12 @@ function AttachmentsPanel({ boardId, currentPage, onRefresh }) {
             <h4 style={{ marginBottom: '10px', fontSize: '14px', fontWeight: '600' }}>
                 Voice Recording
             </h4>
-            <VoiceRecorder boardId={boardId} currentPage={currentPage} onRefresh={onRefresh} />
+            <VoiceRecorder boardId={boardId} onRefresh={onRefresh} />
         </div>
     );
 }
 
-function VoiceRecorder({ boardId, currentPage, onRefresh }) {
+function VoiceRecorder({ boardId, onRefresh }) {
     const [isRecording, setIsRecording] = useState(false);
     const [mediaRecorder, setMediaRecorder] = useState(null);
     const [audioChunks, setAudioChunks] = useState([]);
@@ -367,7 +366,7 @@ function VoiceRecorder({ boardId, currentPage, onRefresh }) {
                 const formData = new FormData();
                 formData.append('audio', audioBlob, 'recording.webm');
                 formData.append('boardId', boardId);
-                formData.append('pageNumber', currentPage);
+                formData.append('pageNumber', 1);
                 
                 try {
                     await uploadApi.uploadVoice(formData);
