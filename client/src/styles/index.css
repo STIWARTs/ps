@@ -73,7 +73,7 @@ body {
 .logo-title h1 {
     font-size: 24px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: #7cb342;
 }
 
 .logo {
@@ -88,7 +88,7 @@ body {
     gap: 8px;
     font-weight: 600;
     font-size: 16px;
-    color: var(--text-primary);
+    color: #7cb342;
 }
 
 .logo-small {
