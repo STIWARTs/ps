@@ -7,7 +7,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:3000', 'https://ps-three-tawny.vercel.app'],
+    origin: [
+        'http://localhost:3000',
+        'https://ps-three-tawny.vercel.app',
+        'https://task-rootvestors.vercel.app'
+    ],
     credentials: true
 }));
 app.use(express.json({ limit: '50mb' }));
