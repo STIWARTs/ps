@@ -15,22 +15,23 @@ router.post('/generate-text', async (req, res) => {
         }
 
         let prompt = '';
+        const baseInstruction = `You are an educational content writer creating material for teachers to read and explain to students. Use clear, formal, and bookish language. Keep content concise but comprehensive. Structure the content well so teachers can easily read it aloud. Avoid overly complex terms but maintain academic quality. ${context ? `Context: ${context}` : ''}`;
         
         switch (type) {
             case 'explanation':
-                prompt = `You are an educational assistant. Explain the following topic in a clear and educational manner suitable for students: ${topic}. ${context ? `Additional context: ${context}` : ''}`;
+                prompt = `${baseInstruction}\n\nProvide a clear, well-structured explanation of "${topic}" that a teacher can read to students. Use proper academic language, include definitions, and provide 1-2 simple examples. Keep it to 8-10 sentences maximum.`;
                 break;
             case 'summary':
-                prompt = `You are an educational assistant. Provide a concise summary of the following topic: ${topic}. ${context ? `Additional context: ${context}` : ''}`;
+                prompt = `${baseInstruction}\n\nWrite a concise academic summary of "${topic}" in 3-4 sentences. Make it suitable for a teacher to read as an introduction or recap.`;
                 break;
             case 'keypoints':
-                prompt = `You are an educational assistant. List the key points about the following topic in bullet points: ${topic}. ${context ? `Additional context: ${context}` : ''}`;
+                prompt = `List ONLY 5 key points about "${topic}". No introductions, no extra text. Just bullet points. Each point must be ONE short line (max 10-12 words). Start directly with the first bullet point.`;
                 break;
             case 'quiz':
-                prompt = `You are an educational assistant. Generate 5 quiz questions with answers about the following topic: ${topic}. ${context ? `Additional context: ${context}` : ''}`;
+                prompt = `Generate ONLY 4 quiz questions about "${topic}". No explanations, no introductions, no extra text. Just questions and answers in this exact format:\n\nQ1: [question]\nA1: [answer]\n\nQ2: [question]\nA2: [answer]\n\nQ3: [question]\nA3: [answer]\n\nQ4: [question]\nA4: [answer]\n\nKeep questions easy to medium. Keep each question and answer to one short line.`;
                 break;
             default:
-                prompt = `You are an educational assistant helping teachers create content. Provide educational content about: ${topic}. ${context ? `Additional context: ${context}` : ''}`;
+                prompt = `${baseInstruction}\n\nProvide educational content about "${topic}" in a format suitable for classroom teaching.`;
         }
 
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
