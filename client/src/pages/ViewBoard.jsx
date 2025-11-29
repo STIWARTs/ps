@@ -67,7 +67,7 @@ function ViewBoard() {
     if (error) {
         return (
             <div className="view-error">
-                <h2>⚠️ {error}</h2>
+                <h2>{error}</h2>
                 <p>Please contact your teacher for the correct link.</p>
             </div>
         );
@@ -97,7 +97,8 @@ function ViewBoard() {
                     align-items: center;
                     justify-content: space-between;
                     padding: 12px 24px;
-                    background: #1a1a2e;
+                    background: #141414;
+                    border-bottom: 1px solid #2a2a2a;
                     color: white;
                 }
                 .view-header h1 {
@@ -105,10 +106,11 @@ function ViewBoard() {
                     font-size: 1.25rem;
                 }
                 .view-badge {
-                    background: #4361ee;
+                    background: linear-gradient(135deg, #7cb342 0%, #6a9e35 100%);
                     padding: 4px 12px;
                     border-radius: 12px;
                     font-size: 0.875rem;
+                    font-weight: 600;
                 }
                 .view-canvas {
                     flex: 1;
@@ -121,11 +123,11 @@ function ViewBoard() {
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    background: #1a1a2e;
+                    background: #0a0a0a;
                     color: white;
                 }
                 .view-error h2 {
-                    color: #ff6b6b;
+                    color: #ef5350;
                 }
             `}</style>
         </div>

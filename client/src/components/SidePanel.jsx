@@ -22,13 +22,13 @@ function SidePanel({ isOpen, onClose, activeTab, onTabChange, boardId, onRefresh
                     style={{
                         width: '28px',
                         height: '28px',
-                        border: 'none',
-                        background: '#f3f4f6',
-                        borderRadius: '4px',
+                        border: '1px solid #2a2a2a',
+                        background: '#1a1a1a',
+                        borderRadius: '6px',
                         cursor: 'pointer',
                         fontSize: '16px',
                         fontWeight: 'bold',
-                        color: '#666',
+                        color: '#a0a0a0',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center'
@@ -183,10 +183,11 @@ function AIPanel() {
             {/* Mode Toggle Switch */}
             <div style={{
                 display: 'flex',
-                background: '#f3f4f6',
+                background: '#1a1a1a',
                 borderRadius: '10px',
                 padding: '4px',
-                marginBottom: '20px'
+                marginBottom: '20px',
+                border: '1px solid #2a2a2a'
             }}>
                 <button
                     onClick={() => setAiMode('text')}
@@ -199,11 +200,11 @@ function AIPanel() {
                         fontWeight: '600',
                         fontSize: '14px',
                         transition: 'all 0.2s',
-                        background: aiMode === 'text' ? '#3b82f6' : 'transparent',
-                        color: aiMode === 'text' ? 'white' : '#6b7280'
+                        background: aiMode === 'text' ? 'linear-gradient(135deg, #7cb342 0%, #6a9e35 100%)' : 'transparent',
+                        color: aiMode === 'text' ? 'white' : '#a0a0a0'
                     }}
                 >
-                    📝 Text
+                    Text
                 </button>
                 <button
                     onClick={() => setAiMode('image')}
@@ -216,11 +217,11 @@ function AIPanel() {
                         fontWeight: '600',
                         fontSize: '14px',
                         transition: 'all 0.2s',
-                        background: aiMode === 'image' ? 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' : 'transparent',
-                        color: aiMode === 'image' ? 'white' : '#6b7280'
+                        background: aiMode === 'image' ? 'linear-gradient(135deg, #7cb342 0%, #6a9e35 100%)' : 'transparent',
+                        color: aiMode === 'image' ? 'white' : '#a0a0a0'
                     }}
                 >
-                    🎨 Image
+                    Image
                 </button>
             </div>
 
@@ -283,10 +284,12 @@ function AIPanel() {
                             style={{ 
                                 width: '100%', 
                                 padding: '12px', 
-                                border: '1px solid #d1d5db',
+                                border: '1px solid #2a2a2a',
                                 borderRadius: '8px',
                                 fontSize: '14px',
-                                marginBottom: '10px'
+                                marginBottom: '10px',
+                                background: '#1a1a1a',
+                                color: '#ffffff'
                             }}
                             onKeyPress={(e) => e.key === 'Enter' && generateImage()}
                         />
@@ -298,35 +301,36 @@ function AIPanel() {
                         disabled={imageLoading}
                         style={{ 
                             width: '100%', 
-                            marginBottom: '15px',
-                            background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'
+                            marginBottom: '15px'
                         }}
                     >
-                        {imageLoading ? '🎨 Generating Image...' : '🎨 Generate Image'}
+                        {imageLoading ? 'Generating Image...' : 'Generate Image'}
                     </button>
 
                     {imageLoading && (
                         <div style={{ 
                             padding: '12px', 
-                            background: '#eff6ff', 
+                            background: 'rgba(124, 179, 66, 0.15)', 
                             borderRadius: '8px',
                             marginBottom: '10px',
                             fontSize: '13px',
-                            color: '#1e40af',
-                            textAlign: 'center'
+                            color: '#7cb342',
+                            textAlign: 'center',
+                            border: '1px solid rgba(124, 179, 66, 0.3)'
                         }}>
-                            ⏳ First generation may take 20-30 seconds...
+                            First generation may take 20-30 seconds...
                         </div>
                     )}
 
                     {imageError && (
                         <div style={{ 
                             padding: '12px', 
-                            background: '#fef3c7', 
+                            background: 'rgba(255, 152, 0, 0.15)', 
                             borderRadius: '8px',
                             marginBottom: '10px',
                             fontSize: '13px',
-                            color: '#92400e'
+                            color: '#ff9800',
+                            border: '1px solid rgba(255, 152, 0, 0.3)'
                         }}>
                             {imageError}
                             {searchTerms.length > 0 && (
@@ -337,7 +341,7 @@ function AIPanel() {
                                                 href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(term)}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#1d4ed8' }}
+                                                style={{ color: '#7cb342' }}
                                             >
                                                 {term}
                                             </a>
@@ -356,7 +360,7 @@ function AIPanel() {
                                 style={{ 
                                     width: '100%', 
                                     borderRadius: '8px',
-                                    border: '1px solid #e5e7eb'
+                                    border: '1px solid #2a2a2a'
                                 }}
                             />
                             <div style={{ 
@@ -369,14 +373,14 @@ function AIPanel() {
                                     onClick={downloadImage}
                                     style={{ flex: 1 }}
                                 >
-                                    ⬇️ Download
+                                    Download
                                 </button>
                                 <button 
                                     className="btn btn-secondary"
                                     onClick={copyImageToClipboard}
                                     style={{ flex: 1 }}
                                 >
-                                    📋 Copy
+                                    Copy
                                 </button>
                             </div>
                         </div>
@@ -430,9 +434,11 @@ function YouTubePanel() {
                     style={{ 
                         width: '100%', 
                         padding: '12px', 
-                        border: '1px solid #d1d5db',
+                        border: '1px solid #2a2a2a',
                         borderRadius: '8px',
-                        fontSize: '14px'
+                        fontSize: '14px',
+                        background: '#1a1a1a',
+                        color: '#ffffff'
                     }}
                 />
             </div>
@@ -636,7 +642,7 @@ function VoiceRecorder({ boardId, onRefresh }) {
                 </button>
             )}
             {isRecording && (
-                <p style={{ marginTop: '10px', color: '#ef4444', fontSize: '14px' }}>
+                <p style={{ marginTop: '10px', color: '#ef5350', fontSize: '14px' }}>
                     Recording in progress...
                 </p>
             )}

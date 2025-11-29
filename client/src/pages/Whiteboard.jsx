@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Tldraw } from '@tldraw/tldraw';
+import { Tldraw, DefaultColorThemePalette } from '@tldraw/tldraw';
 import '@tldraw/tldraw/tldraw.css';
 import { boardApi } from '../services/api';
 import SidePanel from '../components/SidePanel';
+import RootwiseLogo from '../assets/rootwise-logo.svg';
 
 function Whiteboard() {
     const { boardId } = useParams();
@@ -214,6 +215,11 @@ function Whiteboard() {
                     <button className="btn btn-secondary" onClick={handleBack}>
                         Back
                     </button>
+                    <div className="logo-title-small">
+                        <img src={RootwiseLogo} alt="Rootwise" className="logo-small" />
+                        <span>Rootwise</span>
+                    </div>
+                    <span style={{ color: '#666' }}>|</span>
                     <h2>{board?.title}</h2>
                 </div>
                 
@@ -251,7 +257,7 @@ function Whiteboard() {
                     
                     {saveMessage && (
                         <span style={{ 
-                            color: '#10b981', 
+                            color: '#7cb342', 
                             fontWeight: '500',
                             fontSize: '14px'
                         }}>
@@ -269,6 +275,11 @@ function Whiteboard() {
                 <Tldraw
                     onMount={handleMount}
                     autoFocus
+                    options={{
+                        defaultUserPreferences: {
+                            colorScheme: 'light'
+                        }
+                    }}
                 />
             </div>
             

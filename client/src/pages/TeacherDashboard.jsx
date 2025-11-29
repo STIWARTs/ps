@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { boardApi } from '../services/api';
 import CreateBoardModal from '../components/CreateBoardModal';
+import RootwiseLogo from '../assets/rootwise-logo.svg';
 
 function TeacherDashboard() {
     const navigate = useNavigate();
@@ -71,7 +72,10 @@ function TeacherDashboard() {
     return (
         <div className="container">
             <header className="header">
-                <h1>Smart Board - Teacher Dashboard</h1>
+                <div className="logo-title">
+                    <img src={RootwiseLogo} alt="Rootwise" className="logo" />
+                    <h1>Rootwise</h1>
+                </div>
                 <button 
                     className="btn btn-primary"
                     onClick={() => setShowCreateModal(true)}
