@@ -33,15 +33,18 @@ router.post('/generate-text', async (req, res) => {
                 prompt = `You are an educational assistant helping teachers create content. Provide educational content about: ${topic}. ${context ? `Additional context: ${context}` : ''}`;
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const generatedText = response.text();
 
         res.json({ text: generatedText });
     } catch (err) {
-        console.error('AI text generation error:', err);
-        res.status(500).json({ error: 'Failed to generate text content' });
+        console.error('AI text generation error:', err.message);
+        res.status(500).json({ 
+            error: 'Failed to generate text content',
+            details: err.message 
+        });
     }
 });
 
@@ -57,7 +60,7 @@ router.post('/generate-image', async (req, res) => {
         const imageStyle = style || 'educational illustration';
         const prompt = `Create an ${imageStyle} about: ${topic}. Make it suitable for educational purposes and classroom use.`;
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         const result = await model.generateContent(
             `Based on the topic "${topic}", suggest 3 relevant image search terms that a teacher could use to find educational images. Return only the search terms, one per line.`
         );
@@ -84,7 +87,7 @@ router.post('/chat', async (req, res) => {
             return res.status(400).json({ error: 'Message is required' });
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         
         let fullPrompt = 'You are a helpful teaching assistant. Help the teacher with any questions about their lesson content, provide suggestions for explanations, and assist with educational content creation.\n\n';
         
@@ -116,7 +119,7 @@ router.post('/search-content', async (req, res) => {
             return res.status(400).json({ error: 'Query is required' });
         }
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         
         let prompt = '';
         switch (contentType) {

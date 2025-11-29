@@ -102,7 +102,8 @@ function AIPanel() {
             setResult(response.data.text);
         } catch (err) {
             console.error('AI generation failed:', err);
-            setResult('Failed to generate content. Please check your API key and try again.');
+            const errorMsg = err.response?.data?.details || err.response?.data?.error || err.message;
+            setResult(`Failed to generate content: ${errorMsg}`);
         } finally {
             setLoading(false);
         }
