@@ -6,7 +6,10 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['http://localhost:3000', 'https://ps-three-tawny.vercel.app'],
+    credentials: true
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -26,6 +29,10 @@ app.use('/api/youtube', require('./routes/youtube'));
 app.use('/api/upload', require('./routes/upload'));
 
 // Health check route
+app.get('/', (req, res) => {
+    res.json({ status: 'ok', message: 'SmartBoard API Server is running' });
+});
+
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Server is running' });
 });
