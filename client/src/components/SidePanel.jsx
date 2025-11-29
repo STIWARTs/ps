@@ -74,10 +74,18 @@ function SidePanel({ isOpen, onClose, activeTab, onTabChange, boardId, onRefresh
 }
 
 function AIPanel() {
+    const [aiMode, setAiMode] = useState('text'); // 'text' or 'image'
     const [topic, setTopic] = useState('');
     const [contentType, setContentType] = useState('explanation');
     const [result, setResult] = useState('');
     const [loading, setLoading] = useState(false);
+    
+    // Image generation states
+    const [imagePrompt, setImagePrompt] = useState('');
+    const [generatedImage, setGeneratedImage] = useState(null);
+    const [imageLoading, setImageLoading] = useState(false);
+    const [imageError, setImageError] = useState('');
+    const [searchTerms, setSearchTerms] = useState([]);
 
     const contentTypes = [
         { value: 'explanation', label: 'Explanation' },
@@ -114,47 +122,265 @@ function AIPanel() {
         alert('Copied to clipboard!');
     };
 
+    const generateImage = async () => {
+        if (!imagePrompt.trim()) {
+            alert('Please enter an image description');
+            return;
+        }
+        
+        try {
+            setImageLoading(true);
+            setGeneratedImage(null);
+            setImageError('');
+            setSearchTerms([]);
+            
+            const response = await aiApi.generateImage({
+                topic: imagePrompt,
+                style: 'educational diagram'
+            });
+            
+            if (response.data.success) {
+                setGeneratedImage(response.data.image);
+            } else if (response.data.fallback) {
+                setImageError(response.data.message);
+                setSearchTerms(response.data.searchTerms || []);
+            } else {
+                setImageError('Failed to generate image');
+            }
+        } catch (err) {
+            console.error('Image generation failed:', err);
+            const errorMsg = err.response?.data?.details || err.response?.data?.error || err.message;
+            setImageError(`Failed to generate image: ${errorMsg}`);
+        } finally {
+            setImageLoading(false);
+        }
+    };
+
+    const downloadImage = () => {
+        if (!generatedImage) return;
+        const link = document.createElement('a');
+        link.href = generatedImage;
+        link.download = `ai-image-${Date.now()}.png`;
+        link.click();
+    };
+
+    const copyImageToClipboard = async () => {
+        if (!generatedImage) return;
+        try {
+            const response = await fetch(generatedImage);
+            const blob = await response.blob();
+            await navigator.clipboard.write([
+                new ClipboardItem({ 'image/png': blob })
+            ]);
+            alert('Image copied to clipboard!');
+        } catch (err) {
+            alert('Failed to copy image. Try downloading instead.');
+        }
+    };
+
     return (
         <div>
-            <div className="ai-input-group">
-                <textarea
-                    value={topic}
-                    onChange={(e) => setTopic(e.target.value)}
-                    placeholder="Enter a topic to generate content about..."
-                />
+            {/* Mode Toggle Switch */}
+            <div style={{
+                display: 'flex',
+                background: '#f3f4f6',
+                borderRadius: '10px',
+                padding: '4px',
+                marginBottom: '20px'
+            }}>
+                <button
+                    onClick={() => setAiMode('text')}
+                    style={{
+                        flex: 1,
+                        padding: '10px 16px',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        transition: 'all 0.2s',
+                        background: aiMode === 'text' ? '#3b82f6' : 'transparent',
+                        color: aiMode === 'text' ? 'white' : '#6b7280'
+                    }}
+                >
+                    📝 Text
+                </button>
+                <button
+                    onClick={() => setAiMode('image')}
+                    style={{
+                        flex: 1,
+                        padding: '10px 16px',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        transition: 'all 0.2s',
+                        background: aiMode === 'image' ? 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' : 'transparent',
+                        color: aiMode === 'image' ? 'white' : '#6b7280'
+                    }}
+                >
+                    🎨 Image
+                </button>
             </div>
-            
-            <div className="ai-options">
-                {contentTypes.map(type => (
-                    <button
-                        key={type.value}
-                        className={`ai-option ${contentType === type.value ? 'selected' : ''}`}
-                        onClick={() => setContentType(type.value)}
-                    >
-                        {type.label}
-                    </button>
-                ))}
-            </div>
-            
-            <button 
-                className="btn btn-primary" 
-                onClick={generateContent}
-                disabled={loading}
-                style={{ width: '100%', marginBottom: '15px' }}
-            >
-                {loading ? 'Generating...' : 'Generate Content'}
-            </button>
-            
-            {result && (
+
+            {/* Text Generation Section */}
+            {aiMode === 'text' && (
                 <div>
-                    <div className="ai-result">{result}</div>
+                    <div className="ai-input-group">
+                        <textarea
+                            value={topic}
+                            onChange={(e) => setTopic(e.target.value)}
+                            placeholder="Enter a topic to generate content about..."
+                        />
+                    </div>
+                    
+                    <div className="ai-options">
+                        {contentTypes.map(type => (
+                            <button
+                                key={type.value}
+                                className={`ai-option ${contentType === type.value ? 'selected' : ''}`}
+                                onClick={() => setContentType(type.value)}
+                            >
+                                {type.label}
+                            </button>
+                        ))}
+                    </div>
+                    
                     <button 
-                        className="btn btn-secondary" 
-                        onClick={copyToClipboard}
-                        style={{ marginTop: '10px' }}
+                        className="btn btn-primary" 
+                        onClick={generateContent}
+                        disabled={loading}
+                        style={{ width: '100%', marginBottom: '15px' }}
                     >
-                        Copy to Clipboard
+                        {loading ? 'Generating...' : 'Generate Content'}
                     </button>
+                    
+                    {result && (
+                        <div>
+                            <div className="ai-result">{result}</div>
+                            <button 
+                                className="btn btn-secondary" 
+                                onClick={copyToClipboard}
+                                style={{ marginTop: '10px' }}
+                            >
+                                Copy to Clipboard
+                            </button>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Image Generation Section */}
+            {aiMode === 'image' && (
+                <div>
+                    <div className="ai-input-group">
+                        <input
+                            type="text"
+                            value={imagePrompt}
+                            onChange={(e) => setImagePrompt(e.target.value)}
+                            placeholder="Describe the image (e.g., 'water cycle diagram')"
+                            style={{ 
+                                width: '100%', 
+                                padding: '12px', 
+                                border: '1px solid #d1d5db',
+                                borderRadius: '8px',
+                                fontSize: '14px',
+                                marginBottom: '10px'
+                            }}
+                            onKeyPress={(e) => e.key === 'Enter' && generateImage()}
+                        />
+                    </div>
+                    
+                    <button 
+                        className="btn btn-primary" 
+                        onClick={generateImage}
+                        disabled={imageLoading}
+                        style={{ 
+                            width: '100%', 
+                            marginBottom: '15px',
+                            background: 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)'
+                        }}
+                    >
+                        {imageLoading ? '🎨 Generating Image...' : '🎨 Generate Image'}
+                    </button>
+
+                    {imageLoading && (
+                        <div style={{ 
+                            padding: '12px', 
+                            background: '#eff6ff', 
+                            borderRadius: '8px',
+                            marginBottom: '10px',
+                            fontSize: '13px',
+                            color: '#1e40af',
+                            textAlign: 'center'
+                        }}>
+                            ⏳ First generation may take 20-30 seconds...
+                        </div>
+                    )}
+
+                    {imageError && (
+                        <div style={{ 
+                            padding: '12px', 
+                            background: '#fef3c7', 
+                            borderRadius: '8px',
+                            marginBottom: '10px',
+                            fontSize: '13px',
+                            color: '#92400e'
+                        }}>
+                            {imageError}
+                            {searchTerms.length > 0 && (
+                                <ul style={{ margin: '8px 0 0 16px', padding: 0 }}>
+                                    {searchTerms.map((term, i) => (
+                                        <li key={i}>
+                                            <a 
+                                                href={`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(term)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ color: '#1d4ed8' }}
+                                            >
+                                                {term}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                    )}
+
+                    {generatedImage && (
+                        <div style={{ marginBottom: '15px' }}>
+                            <img 
+                                src={generatedImage} 
+                                alt="AI Generated"
+                                style={{ 
+                                    width: '100%', 
+                                    borderRadius: '8px',
+                                    border: '1px solid #e5e7eb'
+                                }}
+                            />
+                            <div style={{ 
+                                display: 'flex', 
+                                gap: '8px', 
+                                marginTop: '10px' 
+                            }}>
+                                <button 
+                                    className="btn btn-secondary"
+                                    onClick={downloadImage}
+                                    style={{ flex: 1 }}
+                                >
+                                    ⬇️ Download
+                                </button>
+                                <button 
+                                    className="btn btn-secondary"
+                                    onClick={copyImageToClipboard}
+                                    style={{ flex: 1 }}
+                                >
+                                    📋 Copy
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

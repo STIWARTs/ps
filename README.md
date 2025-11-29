@@ -16,7 +16,9 @@ A digital smartboard application for teachers built using tldraw SDK. This appli
 - Frontend: React.js with tldraw SDK
 - Backend: Node.js with Express.js
 - Database: MongoDB
-- AI: OpenAI API / Google Gemini API
+- AI Text: Google Gemini API (free tier available)
+- AI Image: Pollinations.ai (100% free, no API key needed)
+- Deployment: Vercel (frontend) + Render (backend)
 
 ## Project Structure
 

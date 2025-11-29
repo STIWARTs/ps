@@ -49,7 +49,7 @@ router.post('/generate-text', async (req, res) => {
     }
 });
 
-// Generate image suggestions based on topic
+// Generate image using Pollinations.ai (Free, No API key needed)
 router.post('/generate-image', async (req, res) => {
     try {
         const { topic, style } = req.body;
@@ -58,24 +58,53 @@ router.post('/generate-image', async (req, res) => {
             return res.status(400).json({ error: 'Topic is required' });
         }
 
-        const imageStyle = style || 'educational illustration';
-        const prompt = `Create an ${imageStyle} about: ${topic}. Make it suitable for educational purposes and classroom use.`;
+        const imageStyle = style || 'educational diagram';
+        const prompt = `${imageStyle} of ${topic}, educational illustration, clean design, professional, suitable for classroom, high quality, labeled diagram`;
+        
+        // Pollinations.ai - Free AI image generation, no API key needed!
+        const encodedPrompt = encodeURIComponent(prompt);
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1024&height=768&nologo=true`;
 
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-        const result = await model.generateContent(
-            `Based on the topic "${topic}", suggest 3 relevant image search terms that a teacher could use to find educational images. Return only the search terms, one per line.`
-        );
-        const response = await result.response;
-        const searchTerms = response.text();
+        // Fetch the image and convert to base64
+        const response = await fetch(imageUrl);
+        
+        if (!response.ok) {
+            throw new Error(`Pollinations API error: ${response.status}`);
+        }
+
+        const imageBuffer = await response.arrayBuffer();
+        const base64Image = Buffer.from(imageBuffer).toString('base64');
+        const mimeType = response.headers.get('content-type') || 'image/jpeg';
 
         res.json({ 
-            message: 'Image search terms generated',
-            prompt: prompt,
-            searchTerms: searchTerms.split('\n').filter(term => term.trim())
+            success: true,
+            image: `data:${mimeType};base64,${base64Image}`,
+            prompt: prompt
         });
+
     } catch (err) {
         console.error('AI image generation error:', err);
-        res.status(500).json({ error: 'Failed to generate image suggestions' });
+        
+        // Fallback: provide search terms using Gemini
+        try {
+            const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+            const fallbackResult = await model.generateContent(
+                `Based on the topic "${req.body.topic}", suggest 3 relevant image search terms that a teacher could use to find educational images on Google Images or Unsplash. Return only the search terms, one per line, no numbering.`
+            );
+            const searchTerms = fallbackResult.response.text();
+            
+            res.status(200).json({ 
+                success: false,
+                fallback: true,
+                message: 'Image generation failed. Try these search terms:',
+                searchTerms: searchTerms.split('\n').filter(term => term.trim())
+            });
+        } catch (fallbackErr) {
+            res.status(500).json({ 
+                error: 'Failed to generate image',
+                details: err.message 
+            });
+        }
     }
 });
 
