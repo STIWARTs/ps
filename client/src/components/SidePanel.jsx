@@ -1,13 +1,40 @@
 import { useState } from 'react';
 import { aiApi, youtubeApi, uploadApi } from '../services/api';
 
-function SidePanel({ isOpen, onClose, activeTab, onTabChange, boardId, currentPage, onRefresh }) {
+function SidePanel({ isOpen, onClose, activeTab, onTabChange, boardId, onRefresh }) {
+    const getTabTitle = () => {
+        switch(activeTab) {
+            case 'ai': return 'AI Generate';
+            case 'youtube': return 'YouTube Search';
+            case 'attachments': return 'Attachments';
+            default: return 'Tools';
+        }
+    };
+
     return (
         <div className={`side-panel ${isOpen ? 'open' : ''}`}>
             <div className="side-panel-header">
-                <h3>Tools</h3>
-                <button className="btn btn-secondary" onClick={onClose} style={{ padding: '5px 10px' }}>
-                    Close
+                <h3>{getTabTitle()}</h3>
+                <button 
+                    className="close-btn" 
+                    onClick={onClose} 
+                    title="Close"
+                    style={{
+                        width: '28px',
+                        height: '28px',
+                        border: 'none',
+                        background: '#f3f4f6',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        color: '#666',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    X
                 </button>
             </div>
             
